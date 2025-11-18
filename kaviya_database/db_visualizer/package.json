@@ -4,14 +4,15 @@
   "description": "Simple database viewer for PostgreSQL, MySQL, SQLite, and MongoDB",
   "main": "server.js",
   "scripts": {
-    "prestart": "npm ci || npm install",
+    "prestart": "npm install --no-audit --no-fund",
     "start": "node server.js --host 0.0.0.0",
     "dev": "nodemon server.js"
   },
   "dependencies": {
     "express": "^4.18.2",
     "cors": "^2.8.5",
-    "dotenv": "^16.4.5",
+    "dotenv": "^16.6.1",
+    "object-assign": "^4.1.1",
     "pg": "^8.11.3",
     "mysql2": "^3.6.3",
     "sqlite3": "^5.1.6",

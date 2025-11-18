@@ -1,4 +1,4 @@
-const express = require('express'); // ensure core express import, not relative
+const express = require('express'); // ensure core express import; do NOT use './lib/express'
 const path = require('path');
 const fs = require('fs');
 const cors = require('cors');
