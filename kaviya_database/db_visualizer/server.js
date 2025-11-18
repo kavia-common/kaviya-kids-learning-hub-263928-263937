@@ -1,4 +1,5 @@
 const express = require('express'); // ensure core express import; do NOT use './lib/express'
+const expressPkg = require('express/package.json');
 const path = require('path');
 const fs = require('fs');
 const cors = require('cors');
@@ -315,9 +316,9 @@ async function handleApiRequest(req, res, operation) {
   }
 }
 
- // Health check route to confirm startup
+// Health check route to confirm startup and express version
 app.get('/health', (req, res) => {
-  res.json({ status: 'ok', service: 'simple-db-viewer' });
+  res.json({ status: 'ok', service: 'simple-db-viewer', express: expressPkg.version });
 });
 
 // API Routes
@@ -357,6 +358,7 @@ const envInfo = {
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
   console.log(`Database viewer running on http://localhost:${PORT}`);
+  console.log(`Loaded Express v${expressPkg.version}`);
   console.log('\nEnvironment variables expected:');
   Object.entries(envInfo).forEach(([db, vars]) => {
     console.log(`${db}: ${vars}`);
