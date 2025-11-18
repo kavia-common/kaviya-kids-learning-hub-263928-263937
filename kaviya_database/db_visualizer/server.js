@@ -1,6 +1,11 @@
-const express = require('express');
+const express = require('express'); // ensure core express import, not relative
 const path = require('path');
 const fs = require('fs');
+const cors = require('cors');
+const dotenv = require('dotenv');
+
+// Load .env if present
+dotenv.config();
 
 // Database clients
 const { Pool } = require('pg');
@@ -9,23 +14,21 @@ const sqlite3 = require('sqlite3').verbose();
 const { MongoClient } = require('mongodb');
 
 const app = express();
+
+// Standard middleware: JSON parser and CORS
+app.use(express.json());
+app.use(cors());
+
+// Set headers to allow embedding in iframes and security policies
 app.use((req, res, next) => {
-  // Set headers to allow embedding in iframes
   res.setHeader('X-Frame-Options', 'ALLOWALL');
   res.setHeader('Content-Security-Policy', "frame-ancestors *;");
-
-  // CORS headers
-  res.header('Access-Control-Allow-Origin', '*');
-  res.header('Access-Control-Allow-Methods', 'GET,POST,PUT,DELETE,PATCH,OPTIONS');
-  res.header('Access-Control-Allow-Headers', 'Content-Type,Authorization');
-  if (req.method === 'OPTIONS') {
-    return res.sendStatus(204);
-  }
   next();
 });
+
 app.use(express.static(path.join(__dirname, 'public')));
 
-// Load environment variables from .env files
+// Load environment variables from .env-style export files in this folder
 function loadEnvFiles() {
   const envFiles = ['postgres', 'mysql', 'sqlite', 'mongodb'];
   const allEnvVars = {};
@@ -86,10 +89,13 @@ const dbConfigBuilders = {
   
   sqlite: (env) => env.SQLITE_DB ? { path: env.SQLITE_DB } : null,
   
-  mongodb: (env) => env.MONGODB_URL ? {
-    url: env.MONGODB_URL,
-    database: env.MONGODB_DB || 'test'
-  } : null
+  mongodb: (env) => {
+    const url = env.MONGODB_URL || env.MONGODB_URI; // support either var
+    return url ? {
+      url,
+      database: env.MONGODB_DB || (process.env.MONGODB_DB || 'test')
+    } : null;
+  }
 };
 
 // Build configurations
@@ -309,6 +315,11 @@ async function handleApiRequest(req, res, operation) {
   }
 }
 
+ // Health check route to confirm startup
+app.get('/health', (req, res) => {
+  res.json({ status: 'ok', service: 'simple-db-viewer' });
+});
+
 // API Routes
 app.get('/api/databases', async (req, res) => {
   const available = await testConnections();
@@ -327,7 +338,12 @@ app.get('/api/:db/tables/:table/data', (req, res) =>
 );
 
 app.get('/', (req, res) => {
-  res.sendFile(path.join(__dirname, 'public', 'index.html'));
+  const indexPath = path.join(__dirname, 'public', 'index.html');
+  if (fs.existsSync(indexPath)) {
+    res.sendFile(indexPath);
+  } else {
+    res.type('text/plain').send('Simple DB Viewer is running. Visit /health or /api/databases');
+  }
 });
 
 // Environment info
