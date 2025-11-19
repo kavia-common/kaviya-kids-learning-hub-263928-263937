@@ -6,7 +6,8 @@
   "scripts": {
     "start": "node server.js --host 0.0.0.0",
     "dev": "nodemon server.js",
-    "postinstall": "node -e \"const v=require('express/package.json').version; console.log('[postinstall] express version:', v)\""
+    "postinstall": "node -e \"const v=require('express/package.json').version; console.log('[postinstall] express version:', v)\"",
+    "NOTE": "This is a helper viewer only. Do NOT wire this into database container startup."
   },
   "dependencies": {
     "express": "4.18.3",

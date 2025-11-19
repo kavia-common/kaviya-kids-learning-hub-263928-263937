@@ -131,7 +131,9 @@ echo "Port: ${DB_PORT}"
 echo ""
 
 echo "Environment variables saved to db_visualizer/mongodb.env"
-echo "To use with Node.js viewer, run: source db_visualizer/mongodb.env"
+echo "To use with Node.js viewer (optional), run these commands manually:"
+echo "  cd db_visualizer && source mongodb.env && npm ci && npm run start"
+echo "Note: The Node viewer does NOT auto-start with the database container."
 
 echo "To connect to the database, use one of the following commands:"
 echo "mongosh -u ${DB_USER} -p ${DB_PASSWORD} --port ${DB_PORT} --authenticationDatabase admin ${DB_NAME}"
