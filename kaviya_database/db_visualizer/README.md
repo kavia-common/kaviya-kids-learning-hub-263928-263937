@@ -1,20 +1,25 @@
-# Simple DB Viewer
+# Simple DB Viewer (Manual Use Only)
 
 Small Express server to view tables/collections across Postgres, MySQL, SQLite, and MongoDB.
+
+Important:
+- This viewer is NOT started automatically by the kaviya_database container.
+- Do NOT wire this into container startup or health checks. It is for manual/local debugging only.
 
 How to run:
 - Optionally configure Mongo via .env: see .env.example
 - Or source env files produced by startup.sh: `source mongodb.env`
-- Install dependencies:
-  - Install once: `npm install --no-audit --no-fund`
-  - Start: `npm run start`
-  - Dev (auto-reload): `npm run dev`
+- Install dependencies FIRST (required):
+  - `npm ci` (preferred) or `npm install --no-audit --no-fund`
+- Start:
+  - `npm run start`
+- Dev (auto-reload):
+  - `npm run dev`
 
 What changed (stability fixes):
 - Pinned express to 4.18.3 to avoid intermittent `./lib/express` resolution errors.
 - Removed prestart install loops; start is now a simple `node server.js`.
-- Added postinstall sanity check that logs the installed Express version.
-- Added .npmrc to disable audit/fund prompts and avoid workspace/lock-only flags interfering with CI.
+- Added .npmrc recommendation to disable audit/fund prompts and avoid workspace/lock-only flags interfering with CI.
 
 Health:
 - GET /health -> { status: "ok", service: "simple-db-viewer", express: "4.18.3" }
@@ -31,5 +36,5 @@ Troubleshooting:
   1) Move aside node_modules and lock (avoid rm -rf in CI):  
      `mv node_modules node_modules.backup.$(date +%s) 2>/dev/null || true; mv package-lock.json package-lock.backup.$(date +%s) 2>/dev/null || true`
   2) Ensure no local files/folders named `express` or `lib/express` exist in this project.
-  3) Reinstall: `npm install --no-audit --no-fund`
+  3) Reinstall: `npm ci` (preferred) or `npm install --no-audit --no-fund`
   4) Verify: `node -e "console.log(require('express/package.json').version)"` should print 4.18.3
